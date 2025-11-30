@@ -1,5 +1,5 @@
 ---
-title: "Build a REST API with Lyceum"
+title: "Build a REST API with Lyceum V2"
 ---
 
 In this tutorial, we will build a simple REST API using [FastAPI](https://fastapi.tiangolo.com/), package it into a [Docker](https://www.docker.com/) image, and run it on Lyceum. The container will also run [ngrok](https://ngrok.com/), which gives us a temporary public URL so we can call our API from anywhere while the job is running.
@@ -128,11 +128,11 @@ CMD ["/app/start.sh"]
 ## **Build and Push to Docker Hub**
 
 In this step, we will build our Docker image and push it to Docker Hub. \
-Lyceum will pull this image when running the API. Please run the following commands in your terminal.
+Lyceum will pull this image when running the API.
 
 ### **Set variables**
 
-Replace `yourdockerhubusername` with your Docker Hub username.
+Replace yourdockerhubusername with your Docker Hub username.
 
 ```bash
 export DOCKER_USER=yourdockerhubusername
@@ -145,10 +145,6 @@ export TAG=0.1.0
 ```bash
 docker login
 ```
-
-<Info>
-  Make sure Docker Desktop is running before building the image.
-</Info>
 
 ### **Prepare a buildx builder**
 
