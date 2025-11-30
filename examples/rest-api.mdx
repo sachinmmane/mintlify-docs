@@ -132,12 +132,12 @@ Lyceum will pull this image when running the API.
 
 ### **Set variables**
 
-Replace yourdockerhubusername, with your docker hub username.
+Replace yourdockerhubusername with your Docker Hub username.
 
 ```bash
 export DOCKER_USER=yourdockerhubusername
-export IMAGE=simple-fastapi
-export TAG=amd64-ngrok-v3-0.1.0
+export IMAGE=rest-api
+export TAG=0.1.0
 ```
 
 ### **Login to Docker Hub**
@@ -187,14 +187,14 @@ You can generate the`LYCEUM_TOKEN`from https://dashboard.lyceum.technology/api-k
 ![Lyceum Token Pn](/images/lyceum-token.png)
 
 \
-And visit https://dashboard.ngrok.com/ to get`NGROK_TOKEN`.
+And visit https://dashboard.ngrok.com/ to get`NGROK_TOKEN`. Also, replace yourdockerhubusername with your Docker Hub username.
 
 ```bash
 export LYCEUM_TOKEN="your-lyceum-token"
 export NGROK_TOKEN="your-ngrok-token"
 export DOCKER_USER=yourdockerhubusername
-export IMAGE=simple-fastapi
-export TAG=amd64-ngrok-v3-0.1.0
+export IMAGE=rest-api
+export TAG=0.1.0
 ```
 
 ### **Start the execution**
