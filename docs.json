@@ -50,7 +50,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.lyceum.technology/"
+      "href": "https://dashboard.mintlify.com"
     }
   },
   "contextual": {
@@ -67,8 +67,9 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/LyceumCloud",
-      "linkedin": "https://www.linkedin.com/company/lyceum-technology/"
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
     }
   }
 }
