@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Lyceum",
   "colors": {
     "primary": "#16A34A",
     "light": "#07C983",
@@ -20,30 +20,6 @@
               "quickstart",
               "development"
             ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
           }
         ]
       },
@@ -59,24 +35,10 @@
         ]
       }
     ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "https://mintcdn.com/lyceum/YDPyN2kfQaBE2TWR/logo/light.png?fit=max&auto=format&n=YDPyN2kfQaBE2TWR&q=85&s=d7bc26a4661b4f5819af0af1704444fa",
+    "dark": "https://mintcdn.com/lyceum/YDPyN2kfQaBE2TWR/logo/dark.png?fit=max&auto=format&n=YDPyN2kfQaBE2TWR&q=85&s=28eab4e6d4edcc1c255fff28c89821bc"
   },
   "navbar": {
     "links": [
