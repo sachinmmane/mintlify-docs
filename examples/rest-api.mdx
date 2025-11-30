@@ -153,7 +153,7 @@ docker login
 ### **Prepare a buildx builder**
 
 ```bash
-docker buildx create --use --name mybuilder || true
+docker buildx create --use --name myapibuilder || true
 docker buildx inspect --bootstrap
 ```
 
@@ -191,11 +191,11 @@ You can generate the`LYCEUM_TOKEN`from https://dashboard.lyceum.technology/api-k
 ![Lyceum Token Pn](/images/lyceum-token.png)
 
 \
-And visit https://dashboard.ngrok.com/ to get`NGROK_TOKEN`. Also, replace yourdockerhubusername with your Docker Hub username.
+And visit  https://dashboard.ngrok.com/get-started/your-authtoken to get`NGROK_TOKEN`. Also, replace yourdockerhubusername with your Docker Hub username.
 
 ```bash
-export LYCEUM_TOKEN="your-lyceum-token"
-export NGROK_TOKEN="your-ngrok-token"
+export LYCEUM_TOKEN=your-lyceum-token
+export NGROK_TOKEN=your-ngrok-token
 export DOCKER_USER=yourdockerhubusername
 export IMAGE=rest-api
 export TAG=0.1.0
