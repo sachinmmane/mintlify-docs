@@ -1,97 +1,56 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Quick Start Guide"
+description: "Get started with Lyceum Cloud in under 2 minutes."
 ---
 
-## Setting up
+## Get started in three steps
 
-Get your documentation site up and running in minutes.
+Set up your Lyceum Cloud account and execute your first code on cloud infrastructure.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+### Step 1: **Create Account & Install Extension**
 
-## Make it yours
+<AccordionGroup>
+  <Accordion title="Sign up for Lyceum Cloud" defaultOpen={false} icon="user-plus">
+    1. Visit the [**Lyceum Cloud Dashboard**](https://dashboard.lyceum.technology/)
+    2. Create your account using email or social login
 
-Design a docs site that looks great and empowers your users.
+       <Tip>
+         New accounts receive starter credits for immediate testing
+       </Tip>
+  </Accordion>
+</AccordionGroup>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+### Step 2: **Configure Authentication**
 
-## Create beautiful pages
+<AccordionGroup>
+  <Accordion title="Install VS Code Extension" defaultOpen icon="download">
+    Click this link to open the Lyceum Cloud extension directly in VS Code, or follow these steps:
 
-Everything you need to create world-class documentation.
+    1. Open VS Code
+    2. Go to Extensions (Ctrl+Shift+X)
+    3. Search for “Lyceum Cloud”
+    4. Click Install on the official Lyceum Cloud extension
+  </Accordion>
+  <Accordion title="Authenticate Lyceum Cloud" defaultOpen icon="gear">
+    1. Open any .py or .ipynb file
+    2. Click the cloud icon
+    3. You will be redirected to the dashboard and then back to the extension
+    4. You are all set up!
+  </Accordion>
+</AccordionGroup>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+### Step 3: Execute Your First Code
 
-## Need inspiration?
+<Accordion title="Run code on the cloud" defaultOpen icon="rocket">
+  1. Create a new Python file (e.g., `hello.py`)
+  2. Write some simple code:
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+     ```python
+     def hello_world():
+         print("Hello World, I was executed on a Lyceum Machine!")
+         return
+     hello_world()
+     
+     ```
+  3. Click the cloud icon in the editor or use Ctrl+Shift+E
+</Accordion>
