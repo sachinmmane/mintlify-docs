@@ -37,8 +37,8 @@
     ],
   },
   "logo": {
-    "light": "https://mintcdn.com/lyceum/YDPyN2kfQaBE2TWR/logo/light.png?fit=max&auto=format&n=YDPyN2kfQaBE2TWR&q=85&s=d7bc26a4661b4f5819af0af1704444fa",
-    "dark": "https://mintcdn.com/lyceum/YDPyN2kfQaBE2TWR/logo/dark.png?fit=max&auto=format&n=YDPyN2kfQaBE2TWR&q=85&s=28eab4e6d4edcc1c255fff28c89821bc"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [
