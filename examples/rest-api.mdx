@@ -1,0 +1,292 @@
+---
+title: "Build a REST API with Lyceum (FastAPI + Docker + ngrok)"
+---
+
+In this tutorial, we will build a simple REST API using FastAPI, package it into a [Docker](https://www.docker.com/) image, and run it on Lyceum. The container will also run [ngrok](https://ngrok.com/), which gives us a temporary public URL so we can call our API from anywhere while the job is running.
+
+Lyceum supports running any Docker container on its cloud infrastructure, making it easy to deploy custom APIs, tools, and workloads.s
+
+## **Prerequisites**
+
+Before we start, you will need following 
+
+- A Lyceum account
+- A [Docker Hub](https://hub.docker.com/) account
+- An [ngrok](https://ngrok.com/) account and an ngrok authtoken
+
+## **Project Setup**
+
+We will create a small Python project named `rest-api`.\
+This project will contain our API code, dependency list, and a Dockerfile.
+
+Create the project folder:
+
+```bash
+mkdir rest-api
+cd rest-api
+```
+
+Your project structure will look like this:
+
+```bash
+rest-api/
+ ├── main.py
+ ├── requirements.txt
+ └── Dockerfile
+```
+
+Inside this folder, add the following files.
+
+### **requirements.txt**
+
+This file lists the dependencies needed by the API.
+
+```javascript requirements.txt
+fastapi==0.100.0
+uvicorn[standard]==0.22.0
+pydantic==2.6.0
+```
+
+### **main.py**
+
+This file contains our FastAPI application. It exposes three endpoints and stores items in memory.
+
+```python main.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    id: int
+    name: str
+
+items = {1: {"id": 1, "name": "apple"}}
+
+@app.get("/")
+def root():
+    return {"message": "hello from fastapi"}
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int):
+    return items.get(item_id, {"error": "not found"})
+
+@app.post("/items", status_code=201)
+def create_item(item: Item):
+    items[item.id] = item.dict()
+    return items[item.id]
+```
+
+### **Dockerfile**
+
+This Dockerfile installs Python, dependencies, and ngrok. It also creates a startup script that launches FastAPI and starts an ngrok tunnel.
+
+```bash dockerfile
+# Dockerfile - includes ngrok v3 (amd64)
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# install system deps
+RUN apt-get update && apt-get install -y curl tar unzip && rm -rf /var/lib/apt/lists/*
+
+# python deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# app files
+COPY . .
+
+# Download ngrok v3 (linux amd64)
+RUN curl -sSL -o /tmp/ngrok-v3.tgz "https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz" \
+ && tar -xzf /tmp/ngrok-v3.tgz -C /usr/local/bin ngrok \
+ && rm -f /tmp/ngrok-v3.tgz \
+ && chmod +x /usr/local/bin/ngrok
+
+# Entry script: run uvicorn + ngrok
+RUN printf '%s\n' \
+'#!/bin/sh' \
+'set -e' \
+'echo "Starting uvicorn on :8000"' \
+'uvicorn main:app --host 0.0.0.0 --port 8000 &' \
+'UVICORN_PID=$!' \
+'' \
+'if [ -n "$NGROK_TOKEN" ]; then' \
+'  echo "Starting ngrok with provided token..."' \
+'  exec ngrok http 8000 --authtoken "$NGROK_TOKEN" --log=stdout' \
+'else' \
+'  echo "NGROK_TOKEN not provided — keeping uvicorn running only."' \
+'  wait $UVICORN_PID' \
+'fi' \
+> /app/start.sh
+RUN chmod +x /app/start.sh
+
+EXPOSE 8000
+CMD ["/app/start.sh"]
+```
+
+## **Build and Push to Docker Hub**
+
+In this step, we will build our Docker image and push it to Docker Hub. \
+Lyceum will pull this image when running the API.
+
+### **Set variables**
+
+Replace yourdockerhubusername, with your docker hub username.
+
+```bash
+export DOCKER_USER=yourdockerhubusername
+export IMAGE=simple-fastapi
+export TAG=amd64-ngrok-v3-0.1.0
+```
+
+### **Login to Docker Hub**
+
+```bash
+docker login
+```
+
+### **Prepare a buildx builder**
+
+```bash
+docker buildx create --use --name mybuilder || true
+docker buildx inspect --bootstrap
+```
+
+### **Build and push the image (linux/amd64)**
+
+```bash
+docker buildx build --platform linux/amd64 \
+  -t $DOCKER_USER/$IMAGE:$TAG \
+  --push \
+  .
+```
+
+### **Verify the image manifest**
+
+```bash
+docker buildx imagetools inspect docker.io/$DOCKER_USER/$IMAGE:$TAG
+```
+
+You should see:
+
+```bash
+"os": "linux",
+"architecture": "amd64"
+```
+
+## **Run the Docker Image on Lyceum**
+
+Now we will run the image on Lyceum. When the container starts, FastAPI will run, and ngrok will expose a public URL.\
+Jobs can run for up to **600 seconds (10 minutes)**.
+
+### **Set tokens and image details**
+
+You can generate the`LYCEUM_TOKEN`from https://dashboard.lyceum.technology/api-keys.
+
+![Lyceum Token Pn](/images/lyceum-token.png)
+
+\
+And visit https://dashboard.ngrok.com/ to get `NGROK_TOKEN`
+
+```bash
+export LYCEUM_TOKEN="your-lyceum-token"
+export NGROK_TOKEN="your-ngrok-token"
+export DOCKER_USER=yourdockerhubusername
+export IMAGE=simple-fastapi
+export TAG=amd64-ngrok-v3-0.1.0
+```
+
+### **Start the execution**
+
+```bash
+RESP=$(curl -sS -X POST https://api.lyceum.technology/api/v2/external/execution/image/start \
+  -H "Authorization: Bearer $LYCEUM_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"docker_image_ref\": \"docker.io/${DOCKER_USER}/${IMAGE}:${TAG}\",
+    \"docker_run_cmd\": [],
+    \"docker_run_env\": \"PORT=8000\\nNGROK_TOKEN=${NGROK_TOKEN}\",
+    \"execution_type\": \"cpu\",
+    \"timeout\": 600
+  }")
+```
+
+Print the response:
+
+```bash
+echo "$RESP" | jq .
+```
+
+Extract fields:
+
+```bash
+EXEC_ID=$(echo "$RESP" | jq -r '.execution_id')
+STREAM_URL=$(echo "$RESP" | jq -r '.streaming_url')
+echo "execution_id=$EXEC_ID"
+echo "stream_url=$STREAM_URL"
+```
+
+## **Get the ngrok Public URL**
+
+ngrok prints the public HTTPS URL in the logs.
+
+### **Stream the logs**
+
+```bash
+curl -N -H "Authorization: Bearer $LYCEUM_TOKEN" "$STREAM_URL"
+```
+
+### **Extract the first ngrok URL**
+
+```bash
+curl -N -H "Authorization: Bearer $LYCEUM_TOKEN" "$STREAM_URL" \
+  | grep -m1 -oE 'https://[a-z0-9.-]+ngrok.io'
+```
+
+Example log:
+
+```bash
+Forwarding: https://abc-1234.ngrok.io -> http://localhost:8000
+```
+
+Copy the HTTPS URL.
+
+## **Test the API**
+
+Use the ngrok URL to call the API.
+
+### **Root endpoint**
+
+```bash
+curl -i https://abc-1234.ngrok.io/
+```
+
+### **Get an item**
+
+```bash
+curl -i https://abc-1234.ngrok.io/items/1
+```
+
+### **Create an item**
+
+```bash
+curl -i -X POST https://abc-1234.ngrok.io/items \
+  -H "Content-Type: application/json" \
+  -d '{"id":10,"name":"mango"}'
+```
+
+## **Summary**
+
+Here is quick summary of the steps we followed:
+
+1. Created a FastAPI project
+2. Built a Docker image with ngrok
+3. Pushed the image to Docker Hub
+4. Started the container on Lyceum
+5. Retrieved the ngrok URL
+6. Tested our API endpoints
+
+\
+Your REST API is now running on Lyceum.\
+You can extend this setup for larger applications, background tasks, ML models, or GPU workloads.
