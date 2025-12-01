@@ -28,7 +28,7 @@
             "group": "Examples",
             "pages": [
               "examples/rest-api",
-              "examples/rest-api-quick",
+              "examples/rest-api-quick"
             ]
           }
         ]
