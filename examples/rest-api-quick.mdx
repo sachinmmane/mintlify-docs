@@ -1,0 +1,140 @@
+---
+title: "Build a REST API with Lyceum (Quick)"
+---
+
+In this tutorial, we will learn how to deploy a REST API with Lyceum. To make it easier to follow, we’ve created a simple REST API using [FastAPI](https://fastapi.tiangolo.com/) and packaged it into a [Docker image](https://hub.docker.com/r/sachinmmaneai/rest-api/tags). The container also runs ngrok, which provides a temporary public URL so you can call the API from anywhere while the job is running.
+
+<Info>
+  You can find the [REST API project repository here](https://github.com/sachinmmane/rest-api) and the [Docker image here](https://hub.docker.com/r/sachinmmaneai/rest-api/tags).
+</Info>
+
+Lyceum supports running any Docker container on its cloud infrastructure, making it easy to deploy custom APIs, tools, and workloads.
+
+## **Prerequisites**
+
+Before we start, you will need following
+
+- A [Lyceum](https://dashboard.lyceum.technology/) account
+- An [ngrok](https://ngrok.com/) account
+
+As mentioned earlier, we’ve already built the REST API project for you and packaged it into a Docker image. Our only task is to run this Docker image on Lyceum.
+
+## **Run the Docker Image on Lyceum**
+
+We will run the image on Lyceum. When the container starts, FastAPI will run, and ngrok will expose a public URL.\
+Jobs can run for up to **600 seconds (10 minutes)**.
+
+### **Set tokens and image details**
+
+You can generate the`LYCEUM_TOKEN`from https://dashboard.lyceum.technology/api-keys.
+
+![Lyceum Token Pn](/images/lyceum-token.png)
+
+\
+And visit https://dashboard.ngrok.com/get-started/your-authtoken to get`NGROK_TOKEN`. Also, replace yourdockerhubusername with your Docker Hub username.
+
+```bash
+export LYCEUM_TOKEN="your-lyceum-token"
+export NGROK_TOKEN="your-ngrok-token"
+export DOCKER_USER=yourdockerhubusername
+export IMAGE=rest-api
+export TAG=0.1.0
+```
+
+### **Start the execution**
+
+```bash
+RESP=$(curl -sS -X POST https://api.lyceum.technology/api/v2/external/execution/image/start \
+  -H "Authorization: Bearer $LYCEUM_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"docker_image_ref\": \"docker.io/${DOCKER_USER}/${IMAGE}:${TAG}\",
+    \"docker_run_cmd\": [],
+    \"docker_run_env\": \"PORT=8000\\nNGROK_TOKEN=${NGROK_TOKEN}\",
+    \"execution_type\": \"cpu\",
+    \"timeout\": 600
+  }")
+```
+
+Print the response:
+
+```bash
+echo "$RESP" | jq .
+```
+
+Extract fields:
+
+```bash
+EXEC_ID=$(echo "$RESP" | jq -r '.execution_id')
+STREAM_URL=$(echo "$RESP" | jq -r '.streaming_url')
+echo "execution_id=$EXEC_ID"
+echo "stream_url=$STREAM_URL"
+```
+
+Once the execution starts in Lyceum, you’ll see a screen like this on your Lyceum dashboard.
+
+![Lyceum Dashboard](/images/lyceum-dashboard.png)
+
+## **Get the ngrok Public URL**
+
+ngrok prints the public HTTPS URL in the logs.
+
+### **Stream the logs**
+
+```bash
+curl -N -H "Authorization: Bearer $LYCEUM_TOKEN" "$STREAM_URL"
+```
+
+### **Extract the first ngrok URL**
+
+```bash
+curl -N -H "Authorization: Bearer $LYCEUM_TOKEN" "$STREAM_URL" \
+  | grep -m1 -oE 'https://[a-z0-9.-]+ngrok.io'
+```
+
+Example log:
+
+```bash
+Forwarding: https://abc-1234.ngrok.io -> http://localhost:8000
+```
+
+Copy the HTTPS URL.
+
+## **Test the API**
+
+Use the ngrok URL to call the API.
+
+### **Root endpoint**
+
+```bash
+curl -i https://abc-1234.ngrok.io/
+```
+
+### **Get an item**
+
+```bash
+curl -i https://abc-1234.ngrok.io/items/1
+```
+
+### **Create an item**
+
+```bash
+curl -i -X POST https://abc-1234.ngrok.io/items \
+  -H "Content-Type: application/json" \
+  -d '{"id":10,"name":"mango"}'
+```
+
+## **Summary**
+
+Here is quick summary of the steps we followed:
+
+1. Created a FastAPI project
+2. Built a Docker image with ngrok
+3. Pushed the image to Docker Hub
+4. Started the container on Lyceum
+5. Retrieved the ngrok URL
+6. Tested our API endpoints
+
+\
+Your REST API is now running on Lyceum.\
+You can extend this setup for larger applications, background tasks, ML models, or GPU workloads.
